@@ -9,10 +9,12 @@ module.exports = {
     try {
       const str = "";
       const search = req.query.search ? req.query.search : str;
+      const field = req.query.field || "name";
+      const sort = req.query.sort || "asc";
       const { page, limit } = req.query;
-      const count = await workerModel.countAll();
+      const count = await workerModel.countAll(search, field);
       const paging = await pagination(count.rows[0].count, page, limit);
-      const users = await workerModel.selectAll(paging, search);
+      const users = await workerModel.selectAll(paging, search, field, sort);
 
       const data = [];
       for (let i = 0; i < users.rows.length; i++) {
@@ -29,6 +31,20 @@ module.exports = {
       );
     } catch (err) {
       failed(res, err.message, "failed", "Select List User failed");
+    }
+  },
+  listJob: async (req, res) => {
+    try {
+      const jobs = await workerModel.selectAllJob();
+      const data = jobs.rows.filter(
+        (elem, index, self) =>
+          self.findIndex((t) => {
+            return t.job_desk === elem.job_desk && t.job_desk === elem.job_desk;
+          }) === index
+      );
+      success(res, data, "success", "Select List Job Success");
+    } catch (err) {
+      failed(res, err.message, "failed", "Select List Job failed");
     }
   },
   detail: async (req, res) => {

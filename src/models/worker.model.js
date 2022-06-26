@@ -1,19 +1,34 @@
 const db = require("../config/db");
 
 module.exports = {
-  countAll: () =>
-    new Promise((resolve, reject) => {
-      db.query("SELECT COUNT(*) FROM worker", (error, result) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(result);
-      });
-    }),
-  selectAll: (paging, search) =>
+  countAll: (search, field) =>
     new Promise((resolve, reject) => {
       db.query(
-        `SELECT * FROM worker WHERE name LIKE '%${search}%' LIMIT ${paging.limitValue} OFFSET ${paging.offset}`,
+        `SELECT COUNT(*) FROM worker WHERE ${field} LIKE '%${search}%'`,
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          resolve(result);
+        }
+      );
+    }),
+  selectAll: (paging, search, field, sort) =>
+    new Promise((resolve, reject) => {
+      db.query(
+        `SELECT * FROM worker WHERE ${field} LIKE '%${search}%' ORDER BY name ${sort} LIMIT ${paging.limitValue} OFFSET ${paging.offset}  `,
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          resolve(result);
+        }
+      );
+    }),
+  selectAllJob: () =>
+    new Promise((resolve, reject) => {
+      db.query(
+        `SELECT * FROM worker WHERE job_desk LIKE '%%'`,
         (error, result) => {
           if (error) {
             reject(error);
@@ -34,7 +49,7 @@ module.exports = {
         }
       );
     }),
-    skillWithLimit: (id) =>
+  skillWithLimit: (id) =>
     new Promise((resolve, reject) => {
       db.query(
         `SELECT * FROM skill WHERE user_id = '${id}' LIMIT 3 OFFSET 0`,
@@ -131,15 +146,8 @@ module.exports = {
     }),
   inputExp: (data) =>
     new Promise((resolve, reject) => {
-      const {
-        id,
-        userId,
-        position,
-        companyName,
-        dateJoin,
-        dateOut,
-        desc,
-      } = data;
+      const { id, userId, position, companyName, dateJoin, dateOut, desc } =
+        data;
       db.query(
         `INSERT INTO experience( id, position, company_name, date_join, date_out, description, user_id) 
         VALUES ('${id}', '${position}','${companyName}','${dateJoin}', '${dateOut}', '${desc}', '${userId}')`,

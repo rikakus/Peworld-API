@@ -13,12 +13,14 @@ const {
   inputSkill,
   inputPorto,
   inputExp,
+  listJob,
 } = require("../controllers/worker.controllers");
 
 const router = express.Router();
 
 router
   .get("/worker", list)
+  .get("/job", listJob)
   .get("/worker/:id", jwtAuth, detail)
   .post("/skill", inputSkill)
   .post("/experience", inputExp)
