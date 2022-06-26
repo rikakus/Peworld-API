@@ -36,6 +36,5 @@ app.use((req, res) => {
 
 // running server
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT} with ${NODE_ENV} environment`);
   console.log(`Visit http://localhost:${PORT}`);
 });
